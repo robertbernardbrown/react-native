@@ -10,15 +10,26 @@ const instructions = Platform.select({
 });
 
 export default class App extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>Hello</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
-    );
-  }
+
+state = {
+  greeting: "Welcome to React Native!"
+}
+
+updateGreeting = () => {
+  this.setState({
+    greeting: "Whattup playaaa"
+  })
+}
+
+render() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.welcome}>{this.state.greeting}</Text>
+      <Text onPress={this.updateGreeting} style={styles.instructions}>Change greeting</Text>
+      <Text style={styles.instructions}>{instructions}</Text>
+    </View>
+  );
+}
 }
 
 const styles = StyleSheet.create({
