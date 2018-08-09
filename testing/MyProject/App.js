@@ -1,52 +1,61 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-  default: "this is not iOS or Android",
-});
+import {Platform, FlatList, StyleSheet, Text, View, TouchableHighlight} from 'react-native';
 
 export default class App extends Component {
+  state = { people:[], refreshing: false, page:1 }
 
-state = {
-  greeting: "Welcome to React Native!"
-}
+  componentDidMount () {
+    this.fetchData()
+  }
 
-updateGreeting = () => {
-  this.setState({
-    greeting: "Whattup playaaa"
-  })
-}
+  fetchData = async () => {
+    this.setState({refreshing:true})
+    try {
+      const data = await fetch(`https://swapi.co/api/people?page=${this.state.page}`);
+      const json = await data.json();
+      this.setState({
+        people: json.results,
+        page: this.state.page + 1,
+        refreshing:false
+      })
+    } catch(err) {
+      console.log("error:",  err);
+    }
+  }
 
-render() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>{this.state.greeting}</Text>
-      <Text onPress={this.updateGreeting} style={styles.instructions}>Change greeting</Text>
-      <Text style={styles.instructions}>{instructions}</Text>
-    </View>
-  );
-}
+  renderItem = ({item}) => {
+    return (
+      <View style={{padding:15, borderBottomColor:"#ddd", borderBottomWidth:1}}>
+        <Text style={{fontSize:20}}>{item.name}</Text>
+        <Text style={{color:"rgba(0,0,0,.5)"}}>Gender: {item.gender}</Text>
+      </View>
+    )
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+      <Text>People:</Text>
+        <FlatList  
+          onRefresh={this.fetchData}
+          refreshing={this.state.refreshing}
+          data={this.state.people}
+          keyExtractor={item=>item.name}
+          renderItem={this.renderItem}
+        />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+    paddingVertical:30,
+    paddingHorizontal: 14
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  text: {
+    fontSize: 22
+  }
 });
